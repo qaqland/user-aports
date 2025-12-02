@@ -1,0 +1,43 @@
+# Maintainer: qaqland <qaq@qaq.land>
+pkgname=codebrowser
+pkgver=2.1_git20251201
+_gitrev=9c819d5072dba9ba8eb07646d712b46229f7ecb5
+pkgrel=0
+pkgdesc="Woboq CodeBrowser, Browsing C++ Source Code on the Web"
+url="https://woboq.com/codebrowser.html"
+arch="all"
+license="CC-BY-NC-SA-3.0"
+depends=""
+makedepends="
+	clang19-dev
+	clang19-extra-tools
+	clang19-static
+	cmake
+	llvm19-dev
+	llvm19-gtest
+	llvm19-static
+	samurai
+	"
+subpackages="$pkgname-doc"
+source="$pkgname-$_gitrev.zip::https://github.com/KDAB/codebrowser/archive/$_gitrev.zip"
+builddir="$srcdir/$pkgname-$_gitrev"
+options="!check" # upstream has no testsuit
+
+build() {
+	cmake -B build -G Ninja \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr
+
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+
+	install -Dm644 README.md -t "$pkgdir"/usr/share/doc/$pkgname
+	install -Dm644 LICENSE -t "$pkgdir"/usr/share/licenses/$pkgname
+}
+
+sha512sums="
+940677d78c76509455971396144e63ffc2bda99709d42cee8b5f45ff2fe304851fc00b7b41f03223235fed89a78f5626bf00e309611b70bb050d3b9dbfaf6252  codebrowser-9c819d5072dba9ba8eb07646d712b46229f7ecb5.zip
+"
