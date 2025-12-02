@@ -1,0 +1,19 @@
+# https://gitlab.alpinelinux.org/alpine/aports
+*.apk
+*.gz
+*.tgz
+*.bz2
+*.tbz2
+*.zip
+*.tags
+*.xz
+*.part
+*.tar
+src
+pkg
+pkg-*
+tmp
+build.log
+core
+!core/
+.vscode/
