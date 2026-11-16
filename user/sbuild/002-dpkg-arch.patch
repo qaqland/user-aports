@@ -1,0 +1,11 @@
+diff --git a/lib/Sbuild/ConfBase.pm b/lib/Sbuild/ConfBase.pm
+@@ -107,6 +107,9 @@
+ 
+ 	# Not user-settable.
+ 	chomp(my $native_arch = readpipe("dpkg --print-architecture"));
++	# alpine's dpkg reports the libc triplet (musl-linux-amd64) instead of
++	# the debian architecture name
++	$native_arch =~ s/^musl-linux-//;
+ 
+ 	my @common_keys = (
+ 		'PATH' => {
