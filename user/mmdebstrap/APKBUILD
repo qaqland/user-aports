@@ -1,0 +1,68 @@
+# Maintainer: qaqland <qaq@qaq.land>
+pkgname=mmdebstrap
+pkgver=1.7.0
+pkgrel=0
+pkgdesc="create a Debian chroot"
+url="https://gitlab.mister-muffin.de/josch/mmdebstrap"
+arch="noarch"
+license="Expat"
+depends="
+	apt
+	coreutils
+	findutils
+	perl
+	python3
+	shadow-subids
+	"
+makedepends="
+	help2man
+	perl-utils
+	"
+checkdepends="
+	curl
+	wget
+	debootstrap
+	"
+subpackages="$pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://gitlab.mister-muffin.de/josch/mmdebstrap/archive/$pkgver.tar.gz
+	001-dpkg-arch.patch
+	"
+builddir="$srcdir/$pkgname"
+# options="net" # check needs debian network
+options="!check" # grep-dctrl is deprecated
+
+build() {
+	pod2man mmdebstrap > ./mmdebstrap.1
+	pod2man mmdebstrap-autopkgtest-build-qemu > ./mmdebstrap-autopkgtest-build-qemu.1
+	help2man --no-info --name="filter a tarball like dpkg does" --version-string="$pkgver" ./tarfilter > ./mmtarfilter.1
+
+	mkdir -p usr/include
+	cd /usr/include
+	h2ph -d "$builddir"/usr/include -a syscall.h sys/ioctl.h
+}
+
+check() {
+	export CMD=./mmdebstrap ONLY_HOSTARCH=yes HAVE_QEMU=no FORCE_UPDATE=yes DEFAULT_DIST=oldstable ONLY_DEFAULT_DIST=yes
+	./make_mirror.sh
+	./coverage.sh
+}
+
+package() {
+	install -Dm755 mmdebstrap mmdebstrap-autopkgtest-build-qemu -t "$pkgdir"/usr/bin/
+	install -Dm755 tarfilter "$pkgdir"/usr/bin/mmtarfilter
+	install -Dm755 proxysolver "$pkgdir"/usr/lib/apt/solvers/mmdebstrap-dump-solution
+	mkdir -p "$pkgdir"/usr/share/mmdebstrap
+	cp -a hooks "$pkgdir"/usr/share/mmdebstrap
+	install -Dm755 gpgvnoexpkeysig ldconfig.fakechroot -t "$pkgdir"/usr/libexec/mmdebstrap
+
+	local vendorarch=$(perl -V:vendorarch | cut -d"'" -f2)
+	mkdir -p "$pkgdir""$vendorarch"
+	cp -a usr/include/* "$pkgdir""$vendorarch"
+
+	install -Dm644 mmdebstrap.1 mmdebstrap-autopkgtest-build-qemu.1 mmtarfilter.1 -t "$pkgdir"/usr/share/doc/$pkgname
+}
+
+sha512sums="
+dd4b7147b99dc4974015fade8a058acb63881dc57cf6342baf34f653f60d7322a39be7b6cc6100c4adf9536ea96c1385d048a9d1dfdefe7774af0112469998ad  mmdebstrap-1.7.0.tar.gz
+2f0f2e561cd9d6226cf1fa0bab8ff2ecc11628393497a32b320d94eee40be99246f03debb4df61f51135ee2e98e63b6e215628fc8c9a60287bfdc31257cf60e7  001-dpkg-arch.patch
+"
