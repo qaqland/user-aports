@@ -1,0 +1,21 @@
+diff --git a/make_mirror.sh b/make_mirror.sh
+@@ -404,6 +404,7 @@
+ touch "$newcachedir/mmdebstrapcache"
+ 
+ HOSTARCH=$(dpkg --print-architecture)
++HOSTARCH="${HOSTARCH#musl-linux-}"
+ arches="$HOSTARCH"
+ if [ "$HOSTARCH" = amd64 ]; then
+   arches="$arches arm64 i386"
+
+diff --git a/mmdebstrap b/mmdebstrap
+@@ -6050,6 +6050,9 @@
+       = `eval \$(apt-config shell v Dir::Etc::trustedparts/d); printf %s \$v`;
+ 
+     chomp(my $hostarch = `dpkg --print-architecture`);
++    # alpine's dpkg reports the libc triplet (musl-linux-amd64) instead of
++    # the debian architecture name
++    $hostarch =~ s/^musl-linux-//;
+     my $options = {
+         components      => ["main"],
+         variant         => "important",
