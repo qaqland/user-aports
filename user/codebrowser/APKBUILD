@@ -1,21 +1,20 @@
 # Maintainer: qaqland <qaq@qaq.land>
 pkgname=codebrowser
-pkgver=2.1_git20251201
-_gitrev=9c819d5072dba9ba8eb07646d712b46229f7ecb5
+pkgver=2.1_git20260406
+_gitrev=ebe91a86e4d06a23f5f7709d081f83e2cc14ef26
 pkgrel=0
 pkgdesc="Woboq CodeBrowser, Browsing C++ Source Code on the Web"
 url="https://woboq.com/codebrowser.html"
 arch="all"
 license="CC-BY-NC-SA-3.0"
-depends=""
 makedepends="
-	clang19-dev
-	clang19-extra-tools
-	clang19-static
+	clang22-dev
+	clang22-extra-tools
+	clang22-static
 	cmake
-	llvm19-dev
-	llvm19-gtest
-	llvm19-static
+	llvm22-dev
+	llvm22-gtest
+	llvm22-static
 	samurai
 	"
 subpackages="$pkgname-doc"
@@ -39,5 +38,5 @@ package() {
 }
 
 sha512sums="
-940677d78c76509455971396144e63ffc2bda99709d42cee8b5f45ff2fe304851fc00b7b41f03223235fed89a78f5626bf00e309611b70bb050d3b9dbfaf6252  codebrowser-9c819d5072dba9ba8eb07646d712b46229f7ecb5.zip
+7a633986bcca0a2de9ec0732d1dae5b716cf1f40382bfb2401fc6f15f955bffecb2507107d58e32809c1203bd521708912ce4db26155c8999562e64d5caea1d2  codebrowser-ebe91a86e4d06a23f5f7709d081f83e2cc14ef26.zip
 "
