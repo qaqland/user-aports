@@ -1,0 +1,82 @@
+# Maintainer: qaqland <qaq@qaq.land>
+pkgname=sbuild
+pkgver=0.91.11
+pkgrel=0
+pkgdesc="Tool for building Debian binary packages from Debian sources"
+url="https://tracker.debian.org/pkg/sbuild"
+arch="noarch"
+license="GPL-2.0-or-later"
+depends="
+	bash
+	dpkg-dev
+	mmdebstrap
+	perl
+	perl-exception-class
+	perl-filesys-df
+	perl-mime-lite
+	shadow
+	shadow-subids
+	util-linux-misc
+	zstd
+	"
+makedepends="
+	autoconf
+	automake
+	dpkg-dev
+	perl-filesys-df
+	mandoc-soelim
+	"
+checkdepends="
+	shfmt
+	perl-tidy
+	findutils
+	diffutils
+	perl-yaml-tiny
+	perl-mime-lite
+	perl-exception-class
+	"
+subpackages="$pkgname-doc"
+source="https://salsa.debian.org/debian/sbuild/-/archive/debian/$pkgver/sbuild-debian-$pkgver.tar.gz
+	001-perl-path.patch
+	002-dpkg-arch.patch
+	"
+builddir="$srcdir/sbuild-debian-$pkgver"
+
+prepare() {
+	default_prepare
+	autoreconf -fi
+
+	cd test
+	./check-perltidy --write ./lib/Buildd/Daemon.pm
+}
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--localstatedir=/var
+	make
+}
+
+check() {
+	make check
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+
+	# sbuild-debian-developer-setup is deprecated
+	rm "$pkgdir"/usr/bin/sbuild-debian-developer-setup
+
+	cd "$pkgdir"/usr/bin
+	ln -sf sbuild-abort buildd-abort
+}
+
+sha512sums="
+3df5c2144e5dbd9f68c388145eec7e5c88a90f11177ed8aa611080de35f4ab0de970200896f9001c6d3ff1d22f400cf50b563873d8a79fab48052d23562b20b5  sbuild-debian-0.91.11.tar.gz
+f18510fb3eb49353dba4252a9556b254efa03c0491dea5925461cf565073a0cfa0a04ef2f8e26e6f1696a3773f7827dae1536b920616b012095e11f41f8b3680  001-perl-path.patch
+86f2030ec9e04f752bd384ff344c7bbb42ea01cfed723ffea66445af60e74747642bab1fc3f825b9ca9abf936dda9244d3d7d60cb019ad34cebf769469a77e6d  002-dpkg-arch.patch
+"
